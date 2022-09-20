@@ -1,4 +1,24 @@
-## Tree Guards
+## Socket connection for GitHub Projects 
+
+### Basic Usage
+
+Add new private user project with custom item. 
+
+```
+import { toProject } from "project-sock";
+(async () => {
+  const project = await toProject({
+    owner: "GITHUB_USERNAME",
+    title: "PROJECT TITLE",
+    token: "GITHUB_TOKEN"
+  });
+  const title = "PROJECT ITEM";
+  const body = "## CUSTOM MARKDOWN";
+  await project.addItem(title, body);
+})();
+```
+
+If a project with "PROJECT TITLE" exists, it will be reused.
 
 ### Install
 

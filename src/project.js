@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Project = void 0;
 const addItem = async (inputs) => {
     const { octograph, title, body, id } = inputs;
     const input = "{" + [
@@ -191,4 +194,4 @@ class Project {
         this.call_fifo = this.call_fifo.concat(fns);
     }
 }
-export { Project };
+exports.Project = Project;

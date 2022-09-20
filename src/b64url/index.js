@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.fromB64urlQuery = exports.toB64urlQuery = void 0;
 const chars = [
     'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
     'abcdefghijklmnopqrstuvwxyz',
@@ -129,9 +132,10 @@ const _toB64urlQuery = (o, pre = []) => {
 const toB64urlQuery = o => {
     return _toB64urlQuery(o).replace('&', '?');
 };
+exports.toB64urlQuery = toB64urlQuery;
 const fromB64urlQuery = search => {
     const searchParams = new URLSearchParams(search);
     const params = Object.fromEntries(searchParams.entries());
     return fromB64urlObj(nester(params));
 };
-export { toB64urlQuery, fromB64urlQuery };
+exports.fromB64urlQuery = fromB64urlQuery;

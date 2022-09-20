@@ -1,5 +1,8 @@
-import { ProjectChannel } from "./projectChannel";
-import { toProject } from "./toProject";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.toProjectSock = void 0;
+const projectChannel_1 = require("./projectChannel");
+const toProject_1 = require("./toProject");
 const socket = (sock) => ({
     sock,
     get: (op_id, tag) => {
@@ -24,8 +27,8 @@ const socket = (sock) => ({
     },
 });
 const toProjectSock = async (inputs) => {
-    const project = await toProject(inputs);
+    const project = await (0, toProject_1.toProject)(inputs);
     const inputs_1 = { ...inputs, project };
-    return socket(new ProjectChannel(inputs_1));
+    return socket(new projectChannel_1.ProjectChannel(inputs_1));
 };
-export { toProjectSock };
+exports.toProjectSock = toProjectSock;

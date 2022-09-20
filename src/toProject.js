@@ -1,6 +1,9 @@
-import { graphql } from "@octokit/graphql";
-import { needKeys } from "./util/keys";
-import { Project } from "./project";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.toProject = void 0;
+const graphql_1 = require("@octokit/graphql");
+const keys_1 = require("./util/keys");
+const project_1 = require("./project");
 const findProject = async (inputs) => {
     const { octograph, owner, title } = inputs;
     const { nodes } = (await octograph(`
@@ -36,7 +39,7 @@ const loadProject = async (inputs) => {
     const node = await findProject(inputs);
     const need_keys = ["number", "id"];
     try {
-        needKeys(node || {}, need_keys);
+        (0, keys_1.needKeys)(node || {}, need_keys);
         console.log(`Found Project '${title}'`);
         return node;
     }
@@ -57,7 +60,7 @@ const seeOwner = async (inputs) => {
 };
 const toProject = (inputs) => {
     const { token, owner, title } = inputs;
-    const octograph = graphql.defaults({
+    const octograph = graphql_1.graphql.defaults({
         headers: {
             authorization: `token ${token}`,
         }
@@ -77,7 +80,7 @@ const toProject = (inputs) => {
                 number,
                 id
             };
-            return new Project(inputs_3);
+            return new project_1.Project(inputs_3);
         }).catch((error) => {
             console.error(`Unable to load project.`);
             console.error(error.message);
@@ -87,4 +90,4 @@ const toProject = (inputs) => {
         console.error(error.message);
     });
 };
-export { toProject };
+exports.toProject = toProject;

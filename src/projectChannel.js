@@ -1,9 +1,12 @@
-import { toB64urlQuery, fromB64urlQuery } from "./b64url";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ProjectChannel = void 0;
+const b64url_1 = require("./b64url");
 const serialize = (data) => {
-    return toB64urlQuery({ data });
+    return (0, b64url_1.toB64urlQuery)({ data });
 };
 const deserialize = (str) => {
-    return fromB64urlQuery(str).data;
+    return (0, b64url_1.fromB64urlQuery)(str).data;
 };
 class ProjectChannel {
     constructor(inputs) {
@@ -36,4 +39,4 @@ class ProjectChannel {
         this.project.addItem(k, serialize(a));
     }
 }
-export { ProjectChannel };
+exports.ProjectChannel = ProjectChannel;

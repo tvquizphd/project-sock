@@ -182,16 +182,19 @@ class Project {
         }
         this.waitMap.set(k, resolve);
     }
-    async finish() {
+    async clear(done = false) {
         const { octograph, id, owner, number } = this;
         const to_fetch = { id, owner, number, octograph };
         const items = await fetchItems(to_fetch);
         const fns = items.map(({ id: itemId }) => {
             const inputs = { octograph, id, itemId };
             return removeItem.bind(null, inputs);
-        }).concat([() => this.done = true]);
+        }).concat([() => this.done = done]);
         // Add removal functions to queue
         this.call_fifo = this.call_fifo.concat(fns);
+    }
+    finish() {
+        return this.clear(true);
     }
 }
 exports.Project = Project;

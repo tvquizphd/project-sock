@@ -1,0 +1,47 @@
+import { toB64urlQuery, fromB64urlQuery } from "./b64url";
+
+const serialize = (data) => {
+  return toB64urlQuery({ data });
+}
+
+const deserialize = (str) => {
+  return fromB64urlQuery(str).data;
+}
+
+class ProjectChannel {
+  scope: string;
+  project: any;
+  constructor(inputs) {
+    const { project, scope } = inputs;
+    this.project = project;
+    this.scope = scope;
+  }
+  hasResponse(k) {
+    return this.project.hasResponse(k)
+  }
+  hasRequest() {
+    return true;
+  }
+  toKey(op_id, tag) {
+    const names = [this.scope, op_id, tag];
+    return names.join('__');
+  }
+  listenForKey(k, res) {
+    const resolve = (s) => res(deserialize(s));
+    this.project.awaitItem([k, resolve]);
+  }
+  receiveMailKey(k, res) {
+    const resolve = (s) => res(deserialize(s));
+    this.project.resolver([k, resolve]);
+  }
+  cacheMail(k, a) {
+    this.sendMail(k, a);
+  }
+  sendMail(k, a) {
+    this.project.addItem(k, serialize(a));
+  }
+}
+
+export {
+  ProjectChannel
+}

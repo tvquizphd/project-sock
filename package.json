@@ -1,0 +1,25 @@
+{
+  "name": "project-sock",
+  "version": "1.0.0-alpha.1.0",
+  "description": "Socket connection for GitHub Projects",
+  "type": "module",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "pnpm eslint . --ext .ts",
+    "build:lint": "pnpm build && pnpm lint",
+    "build:publish": "pnpm build && pnpm publish"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.36.2",
+    "@typescript-eslint/parser": "^5.36.2",
+    "eslint": "^8.23.0",
+    "typescript": "^4.8.2"
+  },
+  "keywords": [],
+  "license": "MIT",
+  "dependencies": {
+    "@octokit/graphql": "^5.0.1"
+  }
+}

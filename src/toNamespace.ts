@@ -23,8 +23,8 @@ type Command = Socket & {
 }
 interface NameInterface {
   commands: Command[];
-  projects: Project[];
   sockets: Socket[];
+  project: Project;
 }
 type Namespace = Obj<NameInterface>
 

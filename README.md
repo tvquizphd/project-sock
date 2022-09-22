@@ -4,7 +4,7 @@
 
 Add new private user project with custom item. 
 
-```
+```js
 import { toProject } from "project-sock";
 (async () => {
   const project = await toProject({

@@ -200,8 +200,8 @@ class Project {
         this.waitMap.set(k, resolve);
     }
     async clear(clearArgs) {
-        const done = clearArgs.done || false;
-        const cmds = clearArgs.commands || [];
+        const done = (clearArgs === null || clearArgs === void 0 ? void 0 : clearArgs.done) || false;
+        const cmds = (clearArgs === null || clearArgs === void 0 ? void 0 : clearArgs.commands) || [];
         const { octograph, id, owner, number } = this;
         const to_fetch = { id, owner, number, octograph };
         const items = await fetchItems(to_fetch);

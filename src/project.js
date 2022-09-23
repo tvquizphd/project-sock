@@ -199,22 +199,28 @@ class Project {
         }
         this.waitMap.set(k, resolve);
     }
-    async clear(clearArgs) {
+    clear(clearArgs) {
         const done = (clearArgs === null || clearArgs === void 0 ? void 0 : clearArgs.done) || false;
         const cmds = (clearArgs === null || clearArgs === void 0 ? void 0 : clearArgs.commands) || [];
         const { octograph, id, owner, number } = this;
         const to_fetch = { id, owner, number, octograph };
-        const items = await fetchItems(to_fetch);
-        const clearItems = items.filter(({ title }) => {
-            const ok = cmds.some(({ text }) => text === title);
-            return (cmds.length === 0) ? true : ok;
+        return new Promise((resolve) => {
+            fetchItems(to_fetch).then((items) => {
+                const clearItems = items.filter(({ title }) => {
+                    const ok = cmds.some(({ text }) => text === title);
+                    return (cmds.length === 0) ? true : ok;
+                });
+                const fns = clearItems.map(({ id: itemId }) => {
+                    const inputs = { octograph, id, itemId };
+                    return removeItem.bind(null, inputs);
+                }).concat([() => {
+                        this.done = done;
+                        resolve(done);
+                    }]);
+                // Add all removal functions to the queue
+                this.call_fifo = this.call_fifo.concat(fns);
+            });
         });
-        const fns = clearItems.map(({ id: itemId }) => {
-            const inputs = { octograph, id, itemId };
-            return removeItem.bind(null, inputs);
-        }).concat([() => this.done = done]);
-        // Add removal functions to queue
-        this.call_fifo = this.call_fifo.concat(fns);
     }
     finish() {
         return this.clear({ done: true });

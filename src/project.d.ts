@@ -36,7 +36,7 @@ declare class Project {
     addItem(k: any, v: any): void;
     removeItem(k: any): void;
     awaitItem([k, resolve]: [any, any]): void;
-    clear(clearArgs?: ClearArgs): Promise<void>;
-    finish(): Promise<void>;
+    clear(clearArgs?: ClearArgs): Promise<unknown>;
+    finish(): Promise<unknown>;
 }
 export { Project };

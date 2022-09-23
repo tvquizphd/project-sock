@@ -12,8 +12,10 @@ interface Name {
 type Names = Obj<Name>;
 type FromT = string | Obj<any>;
 
-type Socket = {
-  text: string,
+export type Text = {
+  text: string
+}
+export type Socket = Text & {
   prefix: string,
   suffix: string
 }

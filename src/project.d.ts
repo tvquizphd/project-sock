@@ -1,4 +1,4 @@
-import type { Command } from "./toNamespace";
+import type { Text, Command } from "./toNamespace";
 declare type Resolver = (s: string) => void;
 declare type Queued = () => Promise<void>;
 declare type Item = {
@@ -8,7 +8,7 @@ declare type Item = {
 };
 declare type ClearArgs = {
     done?: boolean;
-    commands?: Command[];
+    commands?: Text[];
 };
 declare class Project {
     id: number;
@@ -34,7 +34,6 @@ declare class Project {
     }): void;
     resolver([k, resolve]: [any, any]): void;
     addItem(k: any, v: any): void;
-    removeItem(k: any): void;
     awaitItem([k, resolve]: [any, any]): void;
     clear(clearArgs?: ClearArgs): Promise<unknown>;
     finish(): Promise<unknown>;

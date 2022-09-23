@@ -159,12 +159,15 @@ class Project {
     resolver([k, resolve]) {
         const itemObject = this.itemObject;
         if (k in itemObject) {
+            const { body } = itemObject[k];
             console.log(`Resolving ${k}`);
             if (this.waitMap.has(k)) {
                 this.waitMap.delete(k);
             }
-            resolve(itemObject[k].body);
-            this.removeItem(k); //TODO
+            const commands = [{ text: k }];
+            const clearArgs = { commands };
+            const finish = () => resolve(body);
+            this.clear(clearArgs).then(finish);
         }
     }
     addItem(k, v) {
@@ -176,20 +179,6 @@ class Project {
             id
         };
         const fn = addItem.bind(null, inputs);
-        this.call_fifo.push(fn);
-    }
-    removeItem(k) {
-        const { itemObject, octograph, id } = this;
-        if (!(k in itemObject)) {
-            throw new Error(`Cannot remove ${k}.`);
-        }
-        const item = itemObject[k];
-        const inputs = {
-            itemId: item.id,
-            octograph,
-            id
-        };
-        const fn = removeItem.bind(null, inputs);
         this.call_fifo.push(fn);
     }
     awaitItem([k, resolve]) {

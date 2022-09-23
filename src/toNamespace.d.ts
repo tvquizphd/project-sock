@@ -10,8 +10,10 @@ interface Name {
     operations: Obj<Operation[]>[];
 }
 declare type Names = Obj<Name>;
-declare type Socket = {
+export declare type Text = {
     text: string;
+};
+export declare type Socket = Text & {
     prefix: string;
     suffix: string;
 };

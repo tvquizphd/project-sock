@@ -86,6 +86,7 @@ const seekItems = (inputs) => {
 class Project {
     constructor(inputs) {
         const { id, number, owner, octograph, title } = inputs;
+        this.commands = inputs.commands || [];
         this.id = id;
         this.title = title;
         this.owner = owner;
@@ -105,6 +106,14 @@ class Project {
         return this.items.reduce((o, i) => {
             return { ...o, [i.title]: i };
         }, {});
+    }
+    get commandObject() {
+        return this.commands.reduce((o, c) => {
+            return { ...o, [c.text]: c };
+        }, {});
+    }
+    get hasCommands() {
+        return this.commands.length > 0;
     }
     hasResponse(k) {
         return k in this.itemObject;
@@ -134,7 +143,15 @@ class Project {
         }
     }
     setItems({ items }) {
-        this.items = items;
+        if (this.hasCommands) {
+            const { commandObject } = this;
+            this.items = items.filter((item) => {
+                return item.title in commandObject;
+            });
+        }
+        else {
+            this.items = items;
+        }
         // Resolve all awaited messages
         const resolver = this.resolver.bind(this);
         [...this.waitMap].forEach(resolver);
@@ -182,11 +199,17 @@ class Project {
         }
         this.waitMap.set(k, resolve);
     }
-    async clear(done = false) {
+    async clear(clearArgs) {
+        const done = clearArgs.done || false;
+        const cmds = clearArgs.commands || [];
         const { octograph, id, owner, number } = this;
         const to_fetch = { id, owner, number, octograph };
         const items = await fetchItems(to_fetch);
-        const fns = items.map(({ id: itemId }) => {
+        const clearItems = items.filter(({ title }) => {
+            const ok = cmds.some(({ text }) => text === title);
+            return (cmds.length === 0) ? true : ok;
+        });
+        const fns = clearItems.map(({ id: itemId }) => {
             const inputs = { octograph, id, itemId };
             return removeItem.bind(null, inputs);
         }).concat([() => this.done = done]);
@@ -194,7 +217,7 @@ class Project {
         this.call_fifo = this.call_fifo.concat(fns);
     }
     finish() {
-        return this.clear(true);
+        return this.clear({ done: true });
     }
 }
 exports.Project = Project;

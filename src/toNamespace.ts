@@ -17,7 +17,7 @@ type Socket = {
   prefix: string,
   suffix: string
 }
-type Command = Socket & {
+export type Command = Socket & {
   subcommand: string,
   command: string
 }

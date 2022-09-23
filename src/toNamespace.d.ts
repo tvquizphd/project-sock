@@ -15,7 +15,7 @@ declare type Socket = {
     prefix: string;
     suffix: string;
 };
-declare type Command = Socket & {
+export declare type Command = Socket & {
     subcommand: string;
     command: string;
 };

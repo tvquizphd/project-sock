@@ -2,6 +2,15 @@ import { graphql } from "@octokit/graphql";
 import { needKeys } from "./util/keys";
 import { Project } from "./project";
 
+import type { Command } from "./toNamespace";
+
+export interface Inputs {
+  commands?: Command[];
+  token: string;
+  owner: string;
+  title: string;
+}
+
 const findProject = async (inputs) => {
   const { octograph, owner, title } = inputs;
   const { nodes } = (await octograph(`
@@ -62,6 +71,7 @@ const seeOwner = async (inputs) => {
 
 const toProject = (inputs) => {
   const {token, owner, title} = inputs;
+  const commands = inputs.commands;
   const octograph = graphql.defaults({
     headers: {
       authorization: `token ${token}`,
@@ -79,6 +89,7 @@ const toProject = (inputs) => {
       console.log(`Loaded Project '${title}'`);
       const inputs_3 = {
         ...inputs_2,
+        commands,
         number,
         id
       };

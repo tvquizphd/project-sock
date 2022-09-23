@@ -19,6 +19,7 @@ declare class Project {
     octograph: any;
     number: number;
     max_time: number;
+    interval: number;
     call_fifo: Queued[];
     commands: Command[];
     waitMap: Map<string, Resolver>;

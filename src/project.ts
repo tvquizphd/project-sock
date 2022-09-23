@@ -109,6 +109,7 @@ class Project {
   octograph: any;
   number: number;
   max_time: number;
+  interval: number;
   call_fifo: Queued[];
   commands: Command[];
   waitMap: Map<string, Resolver>;
@@ -118,13 +119,14 @@ class Project {
        id, number, owner, octograph, title
     } = inputs
     this.commands = inputs.commands || [];
+    this.max_time = inputs.limit || 15 * 60;
+    this.interval = inputs.delay || 1;
     this.id = id;
     this.title = title;
     this.owner = owner;
     this.number = number;
     this.octograph = octograph;
     this.waitMap = new Map();
-    this.max_time = 15 * 60;
     this.call_fifo = [];
     this.done = false;
     this.items = [];
@@ -157,9 +159,9 @@ class Project {
 
   async mainLoop() {
     const inputs = {
-      interval: 1.0,
       owner: this.owner,
       number: this.number,
+      interval: this.interval,
       octograph: this.octograph
     }
     while (!this.done) {

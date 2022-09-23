@@ -71,7 +71,7 @@ const seeOwner = async (inputs) => {
 
 const toProject = (inputs) => {
   const {token, owner, title} = inputs;
-  const commands = inputs.commands;
+  const { commands, limit, delay } = inputs;
   const octograph = graphql.defaults({
     headers: {
       authorization: `token ${token}`,
@@ -89,6 +89,8 @@ const toProject = (inputs) => {
       console.log(`Loaded Project '${title}'`);
       const inputs_3 = {
         ...inputs_2,
+        limit,
+        delay,
         commands,
         number,
         id

@@ -1,2 +1,5 @@
-declare const needKeys: (obj: any, keys: any) => void;
+interface NeedKeys {
+    (o: Record<string, any>, k: string[]): void;
+}
+declare const needKeys: NeedKeys;
 export { needKeys };

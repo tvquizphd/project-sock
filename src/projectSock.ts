@@ -7,7 +7,7 @@ export type ProjectSockInputs = ToProjectInputs & {
   scope: string
 }
 
-interface SocketWrapper {
+export interface SocketWrapper {
   sock: ProjectChannel;
   give: (o: string, t: string, m: string) => void;
   get: (o: string, t: string) => Promise<any>;

@@ -199,7 +199,7 @@ class Project {
                 };
             }).concat([async () => {
                     this.done = done;
-                    resolve(done);
+                    resolve();
                 }]);
             // Add all removal functions to the queue
             this.call_fifo = [

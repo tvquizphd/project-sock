@@ -1,7 +1,8 @@
 import { ProjectChannel } from "./projectChannel";
 import type { ToProjectInputs } from "./toProject";
-import type { ProjectChannelInputs } from "./projectChannel";
-export declare type ProjectSockInputs = (ToProjectInputs & ProjectChannelInputs);
+export declare type ProjectSockInputs = ToProjectInputs & {
+    scope: string;
+};
 interface SocketWrapper {
     sock: ProjectChannel;
     give: (o: string, t: string, m: string) => void;

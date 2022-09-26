@@ -2,11 +2,10 @@ import { ProjectChannel } from "./projectChannel";
 import { toProject } from "./toProject";
 
 import type { ToProjectInputs } from "./toProject"; 
-import type { ProjectChannelInputs } from "./projectChannel"; 
 
-export type ProjectSockInputs = (
-  ToProjectInputs & ProjectChannelInputs
-);
+export type ProjectSockInputs = ToProjectInputs & {
+  scope: string
+}
 
 interface SocketWrapper {
   sock: ProjectChannel;

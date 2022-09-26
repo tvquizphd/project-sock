@@ -11,6 +11,7 @@ declare type ClearArgs = {
     commands?: Text[];
 };
 declare type Item = HasId & Content;
+declare type VoidP = Promise<void>;
 declare type HasItems = Record<"items", Item[]>;
 declare type ToResolve = [string, (s: string) => void];
 export declare type ProjectInputs = HasId & {
@@ -45,8 +46,8 @@ declare class Project {
     resolver([k, resolve]: ToResolve): void;
     addItem(k: string, v: string): void;
     awaitItem([k, resolve]: ToResolve): void;
-    clearItems(items: Item[], clearArgs?: ClearArgs): Promise<unknown>;
-    clear(clearArgs?: ClearArgs): Promise<unknown>;
-    finish(): Promise<unknown>;
+    clearItems(items: Item[], clearArgs?: ClearArgs): VoidP;
+    clear(clearArgs?: ClearArgs): VoidP;
+    finish(): VoidP;
 }
 export { Project };

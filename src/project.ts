@@ -44,6 +44,7 @@ interface AddItem {
   (i: AddInputs): Promise<Item>
 }
 
+type VoidP = Promise<void>
 type HasItems = Record<"items", Item[]>
 type ToResolve = [string, (s: string) => void]
 
@@ -269,7 +270,7 @@ class Project {
     this.waitMap.set(k, resolve);
   }
 
-  clearItems(items: Item[], clearArgs?: ClearArgs) {
+  clearItems(items: Item[], clearArgs?: ClearArgs): VoidP {
     const { octograph, id } = this;
     const done = clearArgs?.done || false;
     const cmds = clearArgs?.commands || [];
@@ -285,7 +286,7 @@ class Project {
         };
       }).concat([async () => {
         this.done = done;
-        resolve(done);
+        resolve();
       }]);
       // Add all removal functions to the queue
       this.call_fifo = [
@@ -294,7 +295,7 @@ class Project {
     })
   }
 
-  async clear(clearArgs?: ClearArgs) {
+  async clear(clearArgs?: ClearArgs): VoidP {
     const { octograph, id, owner, number } = this;
     const to_fetch = { id, owner, number, octograph };
     const items = await fetchItems(to_fetch);

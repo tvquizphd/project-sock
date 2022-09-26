@@ -4,14 +4,35 @@ import { Project } from "./project";
 
 import type { Command } from "./toNamespace";
 
-export interface Inputs {
+type HasId = Record<"id", number>;
+
+type OwnerInputs = {
+  owner: string,
+  octograph: any
+}
+interface SeeOwner {
+  (i: OwnerInputs): Promise<HasId>;
+}
+type LoadInputs = OwnerInputs & {
+  ownerId: number,
+  title: string
+}
+type Loaded = HasId & {
+  number: number
+}
+interface LoadProject {
+  (i: LoadInputs): Promise<Loaded>;
+}
+export interface ToProjectInputs {
   commands?: Command[];
+  delay?: number;
+  limit?: number;
   token: string;
   owner: string;
   title: string;
 }
 
-const findProject = async (inputs) => {
+const findProject: LoadProject = async (inputs) => {
   const { octograph, owner, title } = inputs;
   const { nodes } = (await octograph(`
     query {
@@ -28,7 +49,7 @@ const findProject = async (inputs) => {
   return nodes.length ? nodes[0] : null;
 }
 
-const createProject = async (inputs) => {
+const createProject: LoadProject = async (inputs) => {
   const { octograph, ownerId, title } = inputs;
   const input = `{ownerId: "${ownerId}", title: "${title}"}`;
   return (await octograph(`
@@ -43,7 +64,7 @@ const createProject = async (inputs) => {
   `)).createProjectV2.projectV2;
 }
 
-const loadProject = async (inputs) => {
+const loadProject: LoadProject = async (inputs) => {
   const { title } = inputs;
   const node = await findProject(inputs);
   const need_keys = ["number", "id"];
@@ -58,7 +79,7 @@ const loadProject = async (inputs) => {
   }
 }
 
-const seeOwner = async (inputs) => {
+const seeOwner: SeeOwner = async (inputs) => {
   const { octograph, owner } = inputs;
   return (await octograph(`
     query {
@@ -69,7 +90,7 @@ const seeOwner = async (inputs) => {
   `)).user;
 }
 
-const toProject = (inputs) => {
+const toProject = (inputs: ToProjectInputs) => {
   const {token, owner, title} = inputs;
   const { commands, limit, delay } = inputs;
   const octograph = graphql.defaults({
@@ -96,13 +117,13 @@ const toProject = (inputs) => {
         id
       };
       return new Project(inputs_3);
-    }).catch((error) => {
+    }).catch((e: any) => {
       console.error(`Unable to load project.`);
-      console.error(error.message);
+      console.error(e?.message);
     })
-  }).catch((error) => {
+  }).catch((e: any) => {
     console.error(`Unable to see owner "${owner}"`);
-    console.error(error.message);
+    console.error(e?.message);
   });
 }
 

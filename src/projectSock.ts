@@ -1,7 +1,24 @@
 import { ProjectChannel } from "./projectChannel";
 import { toProject } from "./toProject";
 
-const socket = (sock) => ({
+import type { ToProjectInputs } from "./toProject"; 
+import type { ProjectChannelInputs } from "./projectChannel"; 
+
+export type ProjectSockInputs = (
+  ToProjectInputs & ProjectChannelInputs
+);
+
+interface SocketWrapper {
+  sock: ProjectChannel;
+  give: (o: string, t: string, m: string) => void;
+  get: (o: string, t: string) => Promise<any>;
+}
+
+interface SocketFunction {
+  (s: ProjectChannel): SocketWrapper;
+}
+
+const socket: SocketFunction = (sock) => ({
   sock,
   get: (op_id, tag) => {
     return new Promise(function (resolve) {
@@ -15,17 +32,17 @@ const socket = (sock) => ({
   },
   give: (op_id, tag, msg) => {
     const k = sock.toKey(op_id, tag);
-    if (!sock.hasRequest(k)) {
-      sock.cacheMail(k, msg);
-    } else {
-      sock.sendMail(k, msg);
-    }
+    sock.sendMail(k, msg);
   },
 });
 
-const toProjectSock = async (inputs) => {
+const toProjectSock = async (inputs: ProjectSockInputs) => {
+  const { scope } = inputs;
   const project = await toProject(inputs);
-  const inputs_1 = { ...inputs, project };
+  if (!project) {
+    throw new Error("Unable to find project");
+  }
+  const inputs_1 = { scope, project };
   return socket(new ProjectChannel(inputs_1));
 }
 

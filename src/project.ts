@@ -2,18 +2,62 @@ import type { Text, Command } from "./toNamespace";
 
 type Resolver = (s: string) => void;
 type Queued = () => Promise<void>;
-type Item = {
-  id: number,
-  body: string,
-  title: string
-}
 
+type HasId = Record<"id", number>;
+type Content = {
+  title: string,
+  body: string
+}
+type HasContent = HasId & {
+  content: Content;
+}
 type ClearArgs = {
   done?: boolean,
   commands?: Text[]
 }
+type FetchInputs = {
+  owner: string,
+  number: number,
+  octograph: any
+}
+interface FetchItems {
+  (i: FetchInputs): Promise<Item[]>
+}
+type SeekInputs = FetchInputs & {
+  interval: number,
+}
+interface SeekItems {
+  (i: SeekInputs): Promise<Item[]>
+}
+type RemoveInputs = HasId & {
+  itemId: number,
+  octograph: any
+}
+interface RemoveItem {
+  (i: RemoveInputs): Promise<HasId>
+}
+type Item = HasId & Content;
+type AddInputs = Item & {
+  octograph: any
+}
+interface AddItem {
+  (i: AddInputs): Promise<Item>
+}
 
-const addItem = async (inputs) => {
+type HasItems = Record<"items", Item[]>
+type ToResolve = [string, (s: string) => void]
+
+export type ProjectInputs = HasId & {
+ number: number,
+ owner: string,
+ octograph: any,
+ title: string,
+ limit?: number,
+ delay?: number,
+ commands?: Command[]
+}
+
+const addItem: AddItem = async (inputs) => {
   const { octograph, title, body, id } = inputs;
   const input = "{" + [
     `projectId: "${id}"`,
@@ -42,7 +86,7 @@ const addItem = async (inputs) => {
   };
 }
 
-const removeItem = async (inputs) => {
+const removeItem: RemoveItem = async (inputs) => {
   const { octograph, itemId, id } = inputs;
   const input = "{" + [
     `projectId: "${id}"`,
@@ -59,7 +103,7 @@ const removeItem = async (inputs) => {
   };
 }
 
-const fetchItems = async (inputs) => {
+const fetchItems: FetchItems = async (inputs) => {
   const { octograph, owner, number } = inputs;
   const { nodes } = (await octograph(`
     query {
@@ -80,7 +124,7 @@ const fetchItems = async (inputs) => {
       }
     }
   `)).user.projectV2.items;
-  return nodes.map(n => {
+  return nodes.map((n: HasContent) => {
     return {
       ...n.content,
       id: n.id
@@ -88,7 +132,7 @@ const fetchItems = async (inputs) => {
   });
 }
 
-const seekItems = (inputs) => {
+const seekItems: SeekItems = (inputs) => {
   const { interval } = inputs;
   const dt = 1000 * interval;
   return new Promise((resolve) => {
@@ -114,7 +158,7 @@ class Project {
   commands: Command[];
   waitMap: Map<string, Resolver>;
 
-  constructor(inputs) {
+  constructor(inputs: ProjectInputs) {
     const {
        id, number, owner, octograph, title
     } = inputs
@@ -133,10 +177,6 @@ class Project {
     this.mainLoop();
   }
 
-  get busy() {
-    return !!this.call_fifo.length;
-  }
-
   get itemObject(): Record<string, Item> {
     return this.items.reduce((o, i) => {
       return {...o, [i.title]: i};
@@ -149,11 +189,11 @@ class Project {
     }, {})
   }
 
-  get hasCommands(): boolean {
+  get hasCommands() {
     return this.commands.length > 0;
   }
 
-  hasResponse(k) {
+  hasResponse(k: string) {
     return k in this.itemObject;
   }
 
@@ -166,13 +206,9 @@ class Project {
     }
     while (!this.done) {
       // Add or remove
-      if (this.busy) {
-        try {
-          await this.call_fifo.shift()();
-        }
-        catch (e) {
-          continue;
-        }
+      if (this.call_fifo.length > 0) {
+        const queued = this.call_fifo.shift();
+        await (queued as Queued)();
       }
       // Receive
       else {
@@ -182,7 +218,7 @@ class Project {
     }
   }
 
-  setItems({ items }) {
+  setItems({ items }: HasItems) {
     if (this.hasCommands) {
       const { commandObject } = this;
       this.items = items.filter((item) => {
@@ -197,7 +233,7 @@ class Project {
     [...this.waitMap].forEach(resolver);
   }
 
-  resolver([k, resolve]) {
+  resolver([k, resolve]: ToResolve) {
     const itemObject = this.itemObject;
     if (k in itemObject) {
       const { body } = itemObject[k];
@@ -212,7 +248,7 @@ class Project {
     }
   }
 
-  addItem(k, v) {
+  addItem(k: string, v: string) {
     const { octograph, id } = this;
     const inputs = {
       octograph,
@@ -220,11 +256,12 @@ class Project {
       body: v,
       id
     }
-    const fn = addItem.bind(null, inputs);
-    this.call_fifo.push(fn);
+    this.call_fifo.push(async () => {
+      await addItem(inputs);
+    });
   }
 
-  awaitItem([k, resolve]) {
+  awaitItem([k, resolve]: ToResolve) {
     console.log(`Awaiting ${k}`);
     if (this.waitMap.has(k)) {
       throw new Error(`Repeated ${k} handler`);
@@ -232,28 +269,36 @@ class Project {
     this.waitMap.set(k, resolve);
   }
 
-  clear(clearArgs?: ClearArgs) {
+  clearItems(items: Item[], clearArgs?: ClearArgs) {
+    const { octograph, id } = this;
     const done = clearArgs?.done || false;
     const cmds = clearArgs?.commands || [];
+    const cleared = items.filter(({ title }) => {
+      const ok = cmds.some(({ text }) => text === title);
+      return (cmds.length === 0) ? true : ok;
+    })
+    return new Promise((resolve) => {
+      const fns = cleared.map(({id: itemId}) => {
+        const inputs = {octograph, id, itemId};
+        return async () => {
+          await removeItem(inputs);
+        };
+      }).concat([async () => {
+        this.done = done;
+        resolve(done);
+      }]);
+      // Add all removal functions to the queue
+      this.call_fifo = [
+        ...this.call_fifo, ...fns
+      ];
+    })
+  }
+
+  async clear(clearArgs?: ClearArgs) {
     const { octograph, id, owner, number } = this;
     const to_fetch = { id, owner, number, octograph };
-    return new Promise((resolve) => {
-      fetchItems(to_fetch).then((items) => {
-        const clearItems = items.filter(({ title }) => {
-          const ok = cmds.some(({ text }) => text === title);
-          return (cmds.length === 0) ? true : ok;
-        })
-        const fns = clearItems.map(({id: itemId}) => {
-          const inputs = {octograph, id, itemId};
-          return removeItem.bind(null, inputs);
-        }).concat([() => {
-          this.done = done;
-          resolve(done);
-        }]);
-        // Add all removal functions to the queue
-        this.call_fifo = this.call_fifo.concat(fns);
-      });
-    });
+    const items = await fetchItems(to_fetch);
+    return await this.clearItems(items, clearArgs);
   }
 
   finish() {

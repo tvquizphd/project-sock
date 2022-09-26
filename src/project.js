@@ -66,7 +66,7 @@ const fetchItems = async (inputs) => {
       }
     }
   `)).user.projectV2.items;
-    return nodes.map(n => {
+    return nodes.map((n) => {
         return {
             ...n.content,
             id: n.id
@@ -100,9 +100,6 @@ class Project {
         this.items = [];
         this.mainLoop();
     }
-    get busy() {
-        return !!this.call_fifo.length;
-    }
     get itemObject() {
         return this.items.reduce((o, i) => {
             return { ...o, [i.title]: i };
@@ -128,13 +125,9 @@ class Project {
         };
         while (!this.done) {
             // Add or remove
-            if (this.busy) {
-                try {
-                    await this.call_fifo.shift()();
-                }
-                catch (e) {
-                    continue;
-                }
+            if (this.call_fifo.length > 0) {
+                const queued = this.call_fifo.shift();
+                await queued();
             }
             // Receive
             else {
@@ -179,8 +172,9 @@ class Project {
             body: v,
             id
         };
-        const fn = addItem.bind(null, inputs);
-        this.call_fifo.push(fn);
+        this.call_fifo.push(async () => {
+            await addItem(inputs);
+        });
     }
     awaitItem([k, resolve]) {
         console.log(`Awaiting ${k}`);
@@ -189,28 +183,35 @@ class Project {
         }
         this.waitMap.set(k, resolve);
     }
-    clear(clearArgs) {
+    clearItems(items, clearArgs) {
+        const { octograph, id } = this;
         const done = (clearArgs === null || clearArgs === void 0 ? void 0 : clearArgs.done) || false;
         const cmds = (clearArgs === null || clearArgs === void 0 ? void 0 : clearArgs.commands) || [];
+        const cleared = items.filter(({ title }) => {
+            const ok = cmds.some(({ text }) => text === title);
+            return (cmds.length === 0) ? true : ok;
+        });
+        return new Promise((resolve) => {
+            const fns = cleared.map(({ id: itemId }) => {
+                const inputs = { octograph, id, itemId };
+                return async () => {
+                    await removeItem(inputs);
+                };
+            }).concat([async () => {
+                    this.done = done;
+                    resolve(done);
+                }]);
+            // Add all removal functions to the queue
+            this.call_fifo = [
+                ...this.call_fifo, ...fns
+            ];
+        });
+    }
+    async clear(clearArgs) {
         const { octograph, id, owner, number } = this;
         const to_fetch = { id, owner, number, octograph };
-        return new Promise((resolve) => {
-            fetchItems(to_fetch).then((items) => {
-                const clearItems = items.filter(({ title }) => {
-                    const ok = cmds.some(({ text }) => text === title);
-                    return (cmds.length === 0) ? true : ok;
-                });
-                const fns = clearItems.map(({ id: itemId }) => {
-                    const inputs = { octograph, id, itemId };
-                    return removeItem.bind(null, inputs);
-                }).concat([() => {
-                        this.done = done;
-                        resolve(done);
-                    }]);
-                // Add all removal functions to the queue
-                this.call_fifo = this.call_fifo.concat(fns);
-            });
-        });
+        const items = await fetchItems(to_fetch);
+        return await this.clearItems(items, clearArgs);
     }
     finish() {
         return this.clear({ done: true });

@@ -1,6 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fromB64urlQuery = exports.toB64urlQuery = void 0;
+const isBytes = (o) => {
+    return o.constructor === Uint8Array;
+};
+const isObj = (o) => {
+    return typeof o === "object";
+};
 const chars = [
     'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
     'abcdefghijklmnopqrstuvwxyz',
@@ -53,19 +59,16 @@ const fromB64url = (str) => {
     }
     return bytes;
 };
-const toB64val = v => {
-    if (v.constructor === Uint8Array) {
+const toB64val = (v) => {
+    if (isBytes(v)) {
         return ":" + toB64url(v);
     }
-    if (Array.isArray(v)) {
-        return v.map(i => toB64urlObj(i));
-    }
-    if (typeof v === "object") {
+    else if (isObj(v)) {
         return toB64urlObj(v);
     }
-    return v;
+    return `${v}`;
 };
-const toB64urlObj = o => {
+const toB64urlObj = (o) => {
     const entries = Object.entries(o);
     return entries.reduce((out, [k, v]) => {
         return { ...out, [k]: toB64val(v) };
@@ -78,10 +81,7 @@ const fromB64val = (v) => {
             return fromB64url(val);
         }
     }
-    if (Array.isArray(v)) {
-        return v.map(i => fromB64urlObj(i));
-    }
-    if (typeof v === "object") {
+    if (isObj(v)) {
         return fromB64urlObj(v);
     }
     if (v == "true") {
@@ -122,18 +122,18 @@ const _toB64urlQuery = (o, pre = []) => {
     return entries.reduce((out, [k, v]) => {
         const keys = [...pre, k];
         const key = keys.join('__');
-        if (typeof v === "object") {
+        if (isObj(v)) {
             const value = _toB64urlQuery(v, keys);
             return `${out}${value}`;
         }
         return `${out}&${key}=${v}`;
     }, '');
 };
-const toB64urlQuery = o => {
+const toB64urlQuery = (o) => {
     return _toB64urlQuery(o).replace('&', '?');
 };
 exports.toB64urlQuery = toB64urlQuery;
-const fromB64urlQuery = search => {
+const fromB64urlQuery = (search) => {
     const searchParams = new URLSearchParams(search);
     const params = Object.fromEntries(searchParams.entries());
     return fromB64urlObj(nester(params));

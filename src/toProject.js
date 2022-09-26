@@ -85,13 +85,13 @@ const toProject = (inputs) => {
                 id
             };
             return new project_1.Project(inputs_3);
-        }).catch((error) => {
+        }).catch((e) => {
             console.error(`Unable to load project.`);
-            console.error(error.message);
+            console.error(e === null || e === void 0 ? void 0 : e.message);
         });
-    }).catch((error) => {
+    }).catch((e) => {
         console.error(`Unable to see owner "${owner}"`);
-        console.error(error.message);
+        console.error(e === null || e === void 0 ? void 0 : e.message);
     });
 };
 exports.toProject = toProject;

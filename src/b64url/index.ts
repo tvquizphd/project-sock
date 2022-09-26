@@ -1,3 +1,31 @@
+type Obj<T> = Record<string, T>;
+type ObjAny = Obj<any>;
+type ObjStr = Obj<string>;
+
+export type TreeAny = {
+  [k: string]: TreeAny | boolean | Uint8Array | string;
+}
+export type NodeAny = TreeAny | boolean | Uint8Array | string;
+
+type TreeStr = {
+  [k: string]: TreeStr | string;
+}
+type NodeStr = TreeStr | string;
+
+interface ToB64Q {
+  (o: TreeAny, pre?: string[]): string;
+}
+interface FromB64Q {
+  (s: string): TreeAny;
+}
+
+const isBytes = (o: any): o is Uint8Array => {
+  return o.constructor === Uint8Array;
+}
+const isObj = (o: any): o is ObjAny => {
+  return typeof o === "object";
+}
+
 const chars = [
   'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
   'abcdefghijklmnopqrstuvwxyz',
@@ -56,37 +84,31 @@ const fromB64url = (str: string): Uint8Array => {
   return bytes;
 }
 
-const toB64val = v => {
-  if (v.constructor === Uint8Array) {
+const toB64val = (v: NodeAny): NodeStr => {
+  if (isBytes(v)) {
     return ":" + toB64url(v);
   }
-  if (Array.isArray(v)) {
-    return v.map(i => toB64urlObj(i));
-  }
-  if (typeof v === "object") {
+  else if (isObj(v)) {
     return toB64urlObj(v);
   }
-  return v;
+  return `${v}`;
 }
 
-const toB64urlObj = o => {
+const toB64urlObj = (o: TreeAny): TreeStr => {
   const entries = Object.entries(o);
   return entries.reduce((out, [k, v]) => {
     return {...out, [k]: toB64val(v)};
   }, {});
 }
 
-const fromB64val = (v) => {
+const fromB64val = (v: NodeStr): NodeAny => {
   if (typeof v === "string" && v[0] === ":") {
     const val = v.slice(1);
     if (!val.match(/[^0-9a-zA-Z=_-]/)) {
       return fromB64url(val);
     }
   }
-  if (Array.isArray(v)) {
-    return v.map(i => fromB64urlObj(i));
-  }
-  if (typeof v === "object") {
+  if (isObj(v)) {
     return fromB64urlObj(v);
   }
   if (v == "true") {
@@ -98,19 +120,19 @@ const fromB64val = (v) => {
   return v;
 }
 
-const nester = (params) => {
+const nester = (params: ObjStr): TreeStr => {
   const keyLists = Object.keys(params).map(k => {
     const l = k.split('__');
     return {k, l, len: l.length};
   });
   const keys = keyLists.sort((a, b) => a.len - b.len);
   return keys.reduce((o, {k, l, len}) => {
-    let node = o;
+    let node: TreeStr = o;
     for (let i = 0; i < len - 1; i++) {
       if (!(l[i] in node)) {
         node[l[i]] = {};
       }
-      node = node[l[i]];
+      node = node[l[i]] as TreeStr;
     }
     const last = l.slice(-1)[0];
     node[last] = params[k];
@@ -118,19 +140,19 @@ const nester = (params) => {
   }, {});
 }
 
-const fromB64urlObj = (o) => {
+const fromB64urlObj = (o: NodeStr): TreeAny => {
   const entries = Object.entries(o);
   return entries.reduce((out, [k, v]) => {
     return {...out, [k]: fromB64val(v)};
   }, {});
 }
 
-const _toB64urlQuery = (o, pre=[]) => {
+const _toB64urlQuery: ToB64Q = (o, pre=[]) => {
   const entries = Object.entries(toB64urlObj(o));
   return entries.reduce((out, [k, v]) => {
     const keys = [...pre, k];
     const key = keys.join('__');
-    if (typeof v === "object") {
+    if (isObj(v)) {
       const value = _toB64urlQuery(v, keys);
       return `${out}${value}`;
     }
@@ -138,11 +160,11 @@ const _toB64urlQuery = (o, pre=[]) => {
   }, '');
 }
 
-const toB64urlQuery = o => {
-  return _toB64urlQuery(o).replace('&', '?')
+const toB64urlQuery = (o: TreeAny) => {
+  return _toB64urlQuery(o).replace('&', '?');
 }
 
-const fromB64urlQuery = search => {
+const fromB64urlQuery: FromB64Q = (search) => {
   const searchParams = new URLSearchParams(search);
   const params = Object.fromEntries(searchParams.entries());
   return fromB64urlObj(nester(params));

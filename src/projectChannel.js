@@ -17,9 +17,6 @@ class ProjectChannel {
     hasResponse(k) {
         return this.project.hasResponse(k);
     }
-    hasRequest() {
-        return true;
-    }
     toKey(op_id, tag) {
         const names = [this.scope, op_id, tag];
         return names.join('__');
@@ -31,9 +28,6 @@ class ProjectChannel {
     receiveMailKey(k, res) {
         const resolve = (s) => res(deserialize(s));
         this.project.resolver([k, resolve]);
-    }
-    cacheMail(k, a) {
-        this.sendMail(k, a);
     }
     sendMail(k, a) {
         this.project.addItem(k, serialize(a));

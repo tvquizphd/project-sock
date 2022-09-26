@@ -1,6 +1,6 @@
 {
   "name": "project-sock",
-  "version": "1.0.0-alpha.4.7",
+  "version": "1.0.0-alpha.5.0",
   "description": "Socket connection for GitHub Projects",
   "main": "src/index.js",
   "types": "src/index.d.ts",

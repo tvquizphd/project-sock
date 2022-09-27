@@ -281,8 +281,9 @@ class Project {
     return new Promise((resolve) => {
       const fns = cleared.map(({id: itemId}) => {
         const inputs = {octograph, id, itemId};
+        const ignore = () => null;
         return async () => {
-          await removeItem(inputs);
+          await removeItem(inputs).catch(ignore);
         };
       }).concat([async () => {
         this.done = done;

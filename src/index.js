@@ -16,6 +16,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./projectSock"), exports);
 __exportStar(require("./projectChannel"), exports);
+__exportStar(require("./util/deploy"), exports);
 __exportStar(require("./toNamespace"), exports);
 __exportStar(require("./toProject"), exports);
 __exportStar(require("./project"), exports);

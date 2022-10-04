@@ -5,7 +5,7 @@ type Project = {
 };
 type Operation = Obj<string[]>
 interface Name {
-  sep: [string, string, string];
+  sep: string;
   project: Project;
   operations: Obj<Operation[]>[];
 }
@@ -93,7 +93,7 @@ const unpack: Unpack = (v) => {
         return toT(o2.list).reduce((l3, o3) => {
           const n3 = o3.key;
           const parts = [
-            n0, sep[0], n1, sep[1], n2, sep[2], n3
+            n0, sep, n1, "", n2, sep, n3
           ];
           const command = {
             text: parts.join(''),

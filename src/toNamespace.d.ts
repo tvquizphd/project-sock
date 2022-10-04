@@ -5,7 +5,7 @@ declare type Project = {
 };
 declare type Operation = Obj<string[]>;
 interface Name {
-    sep: [string, string, string];
+    sep: string;
     project: Project;
     operations: Obj<Operation[]>[];
 }

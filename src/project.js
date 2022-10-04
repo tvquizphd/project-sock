@@ -3,14 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Project = void 0;
 const addItem = async (inputs) => {
     const { octograph, title, body, id } = inputs;
-    const input = "{" + [
-        `projectId: "${id}"`,
-        `title: "${title}"`,
-        `body: "${body}"`,
-    ].join(' ') + "}";
+    const add_in = { p: id, t: title, b: body };
     const n = (await octograph(`
-    mutation {
-      addProjectV2DraftIssue(input: ${input}) {
+    mutation($p: ID!, $t: String!, $b: String!) {
+      addProjectV2DraftIssue(input: {projectId: $p, title: $t, body: $b}) {
         projectItem {
           id,
           content {
@@ -23,7 +19,7 @@ const addItem = async (inputs) => {
         }
       }
     }
-  `));
+  `, add_in));
     return {
         ...n.content,
         id: n.id
@@ -31,26 +27,23 @@ const addItem = async (inputs) => {
 };
 const removeItem = async (inputs) => {
     const { octograph, itemId, id } = inputs;
-    const input = "{" + [
-        `projectId: "${id}"`,
-        `itemId: "${itemId}"`,
-    ].join(' ') + "}";
+    const delete_in = { p: id, i: itemId };
     const n = (await octograph(`
-  mutation {
-    deleteProjectV2Item( input: ${input} ) {
+  mutation($p: ID!, $i: ID!) {
+    deleteProjectV2Item( input: {projectId: $p, itemId: $i} ) {
       deletedItemId
     }
-  }`));
+  }`, delete_in));
     return {
         id: n.deletedItemId
     };
 };
 const fetchItems = async (inputs) => {
-    const { octograph, owner, number } = inputs;
+    const { octograph } = inputs;
     const { nodes } = (await octograph(`
-    query {
-      user(login: "${owner}"){
-        projectV2(number: ${number}) {
+    query($owner: String!, $number: Int!) {
+      user(login: $owner){
+        projectV2(number: $number) {
           items(first: 100) {
             nodes {
               id,
@@ -65,7 +58,7 @@ const fetchItems = async (inputs) => {
         }
       }
     }
-  `)).user.projectV2.items;
+  `, inputs)).user.projectV2.items;
     return nodes.map((n) => {
         return {
             ...n.content,

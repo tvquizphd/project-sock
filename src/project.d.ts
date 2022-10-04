@@ -1,7 +1,7 @@
 import type { Text, Command } from "./toNamespace";
 declare type Resolver = (s: string) => void;
 declare type Queued = () => Promise<void>;
-declare type HasId = Record<"id", number>;
+declare type HasId = Record<"id", string>;
 declare type Content = {
     title: string;
     body: string;
@@ -24,7 +24,7 @@ export declare type ProjectInputs = HasId & {
     commands?: Command[];
 };
 declare class Project {
-    id: number;
+    id: string;
     title: string;
     owner: string;
     done: boolean;

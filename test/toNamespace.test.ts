@@ -1,9 +1,6 @@
 import { strict as assert } from 'assert';
 import { toNamespace } from "../src/"
 
-type Sep = [string, string, string];
-
-const sep: Sep = ["__", "", "__"];
 const projects = [{
   title: "verify",
   prefix: "v"
@@ -45,7 +42,7 @@ const namespaces = [{
 describe("Create namespace #1", () => {
   const namespace = toNamespace({
     opaque: {
-      sep,
+      sep: "__",
       project: projects[0],
       operations: [{
         "v": [{
@@ -61,7 +58,7 @@ describe("Create namespace #1", () => {
       }]
     },
     control: {
-      sep,
+      sep: "__",
       project: projects[0],
       operations: [{
         "stat": [{

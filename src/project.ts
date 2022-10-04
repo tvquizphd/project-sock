@@ -3,7 +3,7 @@ import type { Text, Command } from "./toNamespace";
 type Resolver = (s: string) => void;
 type Queued = () => Promise<void>;
 
-type HasId = Record<"id", number>;
+type HasId = Record<"id", string>;
 type Content = {
   title: string,
   body: string
@@ -30,7 +30,7 @@ interface SeekItems {
   (i: SeekInputs): Promise<Item[]>
 }
 type RemoveInputs = HasId & {
-  itemId: number,
+  itemId: string,
   octograph: any
 }
 interface RemoveItem {
@@ -60,14 +60,10 @@ export type ProjectInputs = HasId & {
 
 const addItem: AddItem = async (inputs) => {
   const { octograph, title, body, id } = inputs;
-  const input = "{" + [
-    `projectId: "${id}"`,
-    `title: "${title}"`,
-    `body: "${body}"`,
-  ].join(' ') + "}";
+  const add_in = { p: id, t: title, b: body };
   const n = (await octograph(`
-    mutation {
-      addProjectV2DraftIssue(input: ${input}) {
+    mutation($p: ID!, $t: String!, $b: String!) {
+      addProjectV2DraftIssue(input: {projectId: $p, title: $t, body: $b}) {
         projectItem {
           id,
           content {
@@ -80,7 +76,7 @@ const addItem: AddItem = async (inputs) => {
         }
       }
     }
-  `));
+  `, add_in));
   return {
     ...n.content,
     id: n.id
@@ -89,27 +85,24 @@ const addItem: AddItem = async (inputs) => {
 
 const removeItem: RemoveItem = async (inputs) => {
   const { octograph, itemId, id } = inputs;
-  const input = "{" + [
-    `projectId: "${id}"`,
-    `itemId: "${itemId}"`,
-  ].join(' ') + "}";
+  const delete_in = { p: id, i: itemId };
   const n = (await octograph(`
-  mutation {
-    deleteProjectV2Item( input: ${input} ) {
+  mutation($p: ID!, $i: ID!) {
+    deleteProjectV2Item( input: {projectId: $p, itemId: $i} ) {
       deletedItemId
     }
-  }`));
+  }`, delete_in));
   return {
     id: n.deletedItemId
   };
 }
 
 const fetchItems: FetchItems = async (inputs) => {
-  const { octograph, owner, number } = inputs;
+  const { octograph } = inputs;
   const { nodes } = (await octograph(`
-    query {
-      user(login: "${owner}"){
-        projectV2(number: ${number}) {
+    query($owner: String!, $number: Int!) {
+      user(login: $owner){
+        projectV2(number: $number) {
           items(first: 100) {
             nodes {
               id,
@@ -124,7 +117,7 @@ const fetchItems: FetchItems = async (inputs) => {
         }
       }
     }
-  `)).user.projectV2.items;
+  `, inputs)).user.projectV2.items;
   return nodes.map((n: HasContent) => {
     return {
       ...n.content,
@@ -146,7 +139,7 @@ const seekItems: SeekItems = (inputs) => {
 
 class Project {
 
-  id: number;
+  id: string;
   title: string;
   owner: string;
   done: boolean;

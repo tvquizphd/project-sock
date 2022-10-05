@@ -132,8 +132,9 @@ const undeploy: Undeploy = async (inputs) => {
 const toActive: ToActive = async (octograph, created) => {
   const has_state = { ...created, state: 'IN_PROGRESS' };
   const start_input = [
+    "requiredContexts: []",
     "deploymentId: $id",
-    "state: $state"
+    "state: $state",
   ].join(", ");
   const { deployment } = (await octograph(`
     mutation($id: ID!, $state: DeploymentStatusState!) {

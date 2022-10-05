@@ -132,7 +132,6 @@ const undeploy: Undeploy = async (inputs) => {
 const toActive: ToActive = async (octograph, created) => {
   const has_state = { ...created, state: 'IN_PROGRESS' };
   const start_input = [
-    "requiredContexts: []",
     "deploymentId: $id",
     "state: $state",
   ].join(", ");
@@ -158,6 +157,7 @@ const deploy: Deploy = async (inputs) => {
   const output = plusMeta({ ...has_ref, success });
   const { metadata } = output;
   const create_input = [
+    "requiredContexts: []",
     "environment: $env",
     "repositoryId: $id",
     "refId: $refId"

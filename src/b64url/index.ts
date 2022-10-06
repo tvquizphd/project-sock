@@ -20,7 +20,7 @@ interface FromB64Q {
 }
 
 const isBytes = (o: any): o is Uint8Array => {
-  return o.constructor === Uint8Array;
+  return ArrayBuffer.isView(o);
 }
 const isObj = (o: any): o is ObjAny => {
   return typeof o === "object";

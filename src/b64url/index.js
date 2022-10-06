@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fromB64urlQuery = exports.toB64urlQuery = void 0;
 const isBytes = (o) => {
-    return o.constructor === Uint8Array;
+    return ArrayBuffer.isView(o);
 };
 const isObj = (o) => {
     return typeof o === "object";

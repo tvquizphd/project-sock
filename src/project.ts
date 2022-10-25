@@ -271,29 +271,20 @@ class Project {
       const ok = cmds.some(({ text }) => text === title);
       return (cmds.length === 0) ? true : ok;
     })
-    return new Promise((resolve) => {
-      const fns = cleared.map(({id: itemId}) => {
-        const inputs = {octograph, id, itemId};
-        const ignore = () => null;
-        return async () => {
-          await removeItem(inputs).catch(ignore);
-        };
-      }).concat([async () => {
-        this.done = done;
-        resolve();
-      }]);
-      // Add all removal functions to the queue
-      this.call_fifo = [
-        ...this.call_fifo, ...fns
-      ];
+    const fns = cleared.map(({id: itemId}) => {
+      const inputs = { octograph, id, itemId };
+      const ignore = () => null;
+      return async () => {
+        await removeItem(inputs).catch(ignore);
+      };
+    });
+    return Promise.all(fns).then(() => {
+      this.done = done;
     })
   }
 
   async clear(clearArgs?: ClearArgs): VoidP {
-    const { octograph, id, owner, number } = this;
-    const to_fetch = { id, owner, number, octograph };
-    const items = await fetchItems(to_fetch);
-    return await this.clearItems(items, clearArgs);
+    return await this.clearItems(this.items, clearArgs);
   }
 
   finish() {

@@ -181,12 +181,14 @@ class Project {
             const ok = cmds.some(({ text }) => text === title);
             return (cmds.length === 0) ? true : ok;
         });
-        const fns = cleared.map(({ id: itemId }) => {
+        const fns = cleared.map(async ({ id: itemId }) => {
             const inputs = { octograph, id, itemId };
-            const ignore = () => null;
-            return async () => {
-                await removeItem(inputs).catch(ignore);
-            };
+            try {
+                await removeItem(inputs);
+            }
+            catch {
+                return;
+            }
         });
         return new Promise(resolve => {
             this.call_fifo.push(async () => {

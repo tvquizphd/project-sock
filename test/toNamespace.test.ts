@@ -1,5 +1,5 @@
 import { strict as assert } from 'assert';
-import { toNamespace } from "../src/"
+import { toNamespace } from "../dist"
 
 const projects = [{
   title: "verify",

@@ -1,7 +1,6 @@
 import { graphql } from "@octokit/graphql";
 import { strict as assert } from 'assert';
-import { findProject } from "../src/";
-import { toProject } from "../src/";
+import { findProject, toProject } from "../dist";
 import * as crypto from "crypto";
 import * as dotenv from "dotenv";
 

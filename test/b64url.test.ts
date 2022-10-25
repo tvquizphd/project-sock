@@ -1,5 +1,5 @@
 import { strict as assert } from 'assert';
-import { toB64urlQuery, fromB64urlQuery } from "../src/b64url"
+import { toB64urlQuery, fromB64urlQuery } from "../dist"
 
 type Assertion = [boolean, string];
 

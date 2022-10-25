@@ -1,6 +1,6 @@
 import { graphql } from "@octokit/graphql";
 import { strict as assert } from 'assert';
-import { deploy, undeploy } from "../src/";
+import { deploy, undeploy } from "../dist";
 import * as dotenv from "dotenv";
 
 describe("Deploy and Undeploy", () => {

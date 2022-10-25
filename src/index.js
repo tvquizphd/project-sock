@@ -1,23 +1,7 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./projectSock"), exports);
-__exportStar(require("./projectChannel"), exports);
-__exportStar(require("./util/deploy"), exports);
-__exportStar(require("./toNamespace"), exports);
-__exportStar(require("./toProject"), exports);
-__exportStar(require("./project"), exports);
-__exportStar(require("./b64url"), exports);
+export * from "./projectSock.js";
+export * from "./projectChannel.js";
+export * from "./b64url/index.js";
+export * from "./util/deploy.js";
+export * from "./toNamespace.js";
+export * from "./toProject.js";
+export * from "./project.js";

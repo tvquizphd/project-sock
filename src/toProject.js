@@ -1,14 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.findProject = exports.seeOwnerIds = exports.toProject = void 0;
-const graphql_1 = require("@octokit/graphql");
-const keys_1 = require("./util/keys");
-const project_1 = require("./project");
+import { graphql } from "@octokit/graphql";
+import { needKeys } from "./util/keys.js";
+import { Project } from "./project.js";
 function isLoaded(x) {
     const details = "shortDescription";
     const need_keys = [details, "number", "id"];
     try {
-        (0, keys_1.needKeys)(x || {}, need_keys);
+        needKeys(x || {}, need_keys);
         return true;
     }
     catch {
@@ -40,7 +37,6 @@ const findProject = async (inputs) => {
     }
     return null;
 };
-exports.findProject = findProject;
 const createProject = async (inputs) => {
     const { octograph, ownerId, title } = inputs;
     const create_in = { o: ownerId, t: title };
@@ -110,11 +106,10 @@ const seeOwnerIds = async (inputs) => {
     const repoId = null;
     return { repoId, ownerId };
 };
-exports.seeOwnerIds = seeOwnerIds;
 const toProject = (inputs) => {
     const { token, owner, title, repo } = inputs;
     const { commands, limit, delay } = inputs;
-    const octograph = graphql_1.graphql.defaults({
+    const octograph = graphql.defaults({
         headers: {
             authorization: `token ${token}`,
         }
@@ -136,14 +131,14 @@ const toProject = (inputs) => {
                 number,
                 id
             };
-            return new project_1.Project(inputs_3);
+            return new Project(inputs_3);
         }).catch((e) => {
             console.error(`Unable to load project.`);
-            console.error(e === null || e === void 0 ? void 0 : e.message);
+            console.error(e?.message);
         });
     }).catch((e) => {
         console.error(`Unable to see owner "${owner}"`);
-        console.error(e === null || e === void 0 ? void 0 : e.message);
+        console.error(e?.message);
     });
 };
-exports.toProject = toProject;
+export { toProject, seeOwnerIds, findProject };

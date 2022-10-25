@@ -1,8 +1,8 @@
 import { graphql } from "@octokit/graphql";
-import { needKeys } from "./util/keys";
-import { Project } from "./project";
+import { needKeys } from "./util/keys.js";
+import { Project } from "./project.js";
 
-import type { Command } from "./toNamespace";
+import type { Command } from "./toNamespace.js";
 
 type OwnerInputs = {
   repo?: string,

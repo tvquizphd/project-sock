@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.needKeys = void 0;
 const needKeys = (obj, keys) => {
     const obj_keys = Object.keys(obj).join(' ');
     for (const key of keys) {
@@ -12,4 +9,4 @@ const needKeys = (obj, keys) => {
         }
     }
 };
-exports.needKeys = needKeys;
+export { needKeys };

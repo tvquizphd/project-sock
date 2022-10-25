@@ -1,4 +1,4 @@
-import type { Text, Command } from "./toNamespace";
+import type { Text, Command } from "./toNamespace.js";
 declare type Resolver = (s: string) => void;
 declare type Queued = () => Promise<void>;
 declare type HasId = Record<"id", string>;

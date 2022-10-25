@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.undeploy = exports.deploy = exports.toDeployments = exports.isActive = void 0;
 const FIELDS = `
             id,
             state,
@@ -33,7 +30,6 @@ const isActive = (node) => {
     const is_active = 'IN_PROGRESS' === node.state;
     return isEnv(node) && is_active;
 };
-exports.isActive = isActive;
 const toDeployments = async (inputs) => {
     const { octograph } = inputs;
     const plusMeta = toAddMeta(inputs);
@@ -58,7 +54,6 @@ const toDeployments = async (inputs) => {
     const { id: refId } = defaultBranchRef;
     return { nodes, refId, refName, id };
 };
-exports.toDeployments = toDeployments;
 const undeploy = async (inputs) => {
     const success = false;
     const plusMeta = toAddMeta(inputs);
@@ -78,7 +73,6 @@ const undeploy = async (inputs) => {
     output.success = !!nodes.length;
     return output;
 };
-exports.undeploy = undeploy;
 const toActive = async (octograph, created) => {
     const has_state = { ...created, state: 'IN_PROGRESS' };
     const start_input = [
@@ -133,4 +127,4 @@ const deploy = async (inputs) => {
     output.success = true;
     return output;
 };
-exports.deploy = deploy;
+export { isActive, toDeployments, deploy, undeploy };

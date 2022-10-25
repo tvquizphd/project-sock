@@ -1,7 +1,7 @@
-import { ProjectChannel } from "./projectChannel";
-import { toProject } from "./toProject";
+import { ProjectChannel } from "./projectChannel.js";
+import { toProject } from "./toProject.js";
 
-import type { ToProjectInputs } from "./toProject"; 
+import type { ToProjectInputs } from "./toProject.js"; 
 
 export type ProjectSockInputs = ToProjectInputs & {
   scope: string

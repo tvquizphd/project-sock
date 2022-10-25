@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.toNamespace = void 0;
 const toT = (args) => {
     return args.map(obj => {
         if (typeof obj == "string") {
@@ -79,4 +76,4 @@ const toNamespace = (names) => {
         return { ...o, [k]: namespace };
     }, {});
 };
-exports.toNamespace = toNamespace;
+export { toNamespace };

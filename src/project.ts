@@ -1,4 +1,4 @@
-import type { Text, Command } from "./toNamespace";
+import type { Text, Command } from "./toNamespace.js";
 
 type Resolver = (s: string) => void;
 type Queued = () => Promise<void>;
@@ -278,9 +278,13 @@ class Project {
         await removeItem(inputs).catch(ignore);
       };
     });
-    return Promise.all(fns).then(() => {
-      this.done = done;
-    })
+    return new Promise(resolve => {
+      this.call_fifo.push(async () => {
+        await Promise.all(fns);
+        this.done = done;
+        resolve();
+      });
+    });
   }
 
   async clear(clearArgs?: ClearArgs): VoidP {

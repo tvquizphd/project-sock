@@ -1,5 +1,5 @@
-import { ProjectChannel } from "./projectChannel";
-import type { ToProjectInputs } from "./toProject";
+import { ProjectChannel } from "./projectChannel.js";
+import type { ToProjectInputs } from "./toProject.js";
 export declare type ProjectSockInputs = ToProjectInputs & {
     scope: string;
 };

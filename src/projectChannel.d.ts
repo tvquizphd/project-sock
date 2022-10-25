@@ -1,5 +1,5 @@
-import type { NodeAny } from "./b64url";
-import type { Project } from "./project";
+import type { NodeAny } from "./b64url/index.js";
+import type { Project } from "./project.js";
 declare type Fn = (a: NodeAny) => void;
 export declare type ProjectChannelInputs = {
     project: Project;

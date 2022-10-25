@@ -1,9 +1,10 @@
 {
   "name": "project-sock",
-  "version": "1.0.0-beta.5.0",
+  "version": "1.0.0-beta.5.1",
   "description": "Socket connection for GitHub Projects",
   "main": "src/index.js",
   "types": "src/index.d.ts",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "test": "mocha",

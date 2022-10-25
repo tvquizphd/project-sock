@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Project = void 0;
 const addItem = async (inputs) => {
     const { octograph, title, body, id } = inputs;
     const add_in = { p: id, t: title, b: body };
@@ -178,8 +175,8 @@ class Project {
     }
     clearItems(items, clearArgs) {
         const { octograph, id } = this;
-        const done = (clearArgs === null || clearArgs === void 0 ? void 0 : clearArgs.done) || false;
-        const cmds = (clearArgs === null || clearArgs === void 0 ? void 0 : clearArgs.commands) || [];
+        const done = clearArgs?.done || false;
+        const cmds = clearArgs?.commands || [];
         const cleared = items.filter(({ title }) => {
             const ok = cmds.some(({ text }) => text === title);
             return (cmds.length === 0) ? true : ok;
@@ -191,8 +188,12 @@ class Project {
                 await removeItem(inputs).catch(ignore);
             };
         });
-        return Promise.all(fns).then(() => {
-            this.done = done;
+        return new Promise(resolve => {
+            this.call_fifo.push(async () => {
+                await Promise.all(fns);
+                this.done = done;
+                resolve();
+            });
         });
     }
     async clear(clearArgs) {
@@ -202,4 +203,4 @@ class Project {
         return this.clear({ done: true });
     }
 }
-exports.Project = Project;
+export { Project };

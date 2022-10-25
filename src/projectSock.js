@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.toProjectSock = void 0;
-const projectChannel_1 = require("./projectChannel");
-const toProject_1 = require("./toProject");
+import { ProjectChannel } from "./projectChannel.js";
+import { toProject } from "./toProject.js";
 const socket = (sock) => ({
     sock,
     get: (op_id, tag) => {
@@ -23,11 +20,11 @@ const socket = (sock) => ({
 });
 const toProjectSock = async (inputs) => {
     const { scope } = inputs;
-    const project = await (0, toProject_1.toProject)(inputs);
+    const project = await toProject(inputs);
     if (!project) {
         throw new Error("Unable to find project");
     }
     const inputs_1 = { scope, project };
-    return socket(new projectChannel_1.ProjectChannel(inputs_1));
+    return socket(new ProjectChannel(inputs_1));
 };
-exports.toProjectSock = toProjectSock;
+export { toProjectSock };

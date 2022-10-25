@@ -1,5 +1,5 @@
-import { Project } from "./project";
-import type { Command } from "./toNamespace";
+import { Project } from "./project.js";
+import type { Command } from "./toNamespace.js";
 declare type OwnerInputs = {
     repo?: string;
     owner: string;

@@ -1,7 +1,7 @@
-import { toB64urlQuery, fromB64urlQuery } from "./b64url";
+import { toB64urlQuery, fromB64urlQuery } from "./b64url/index.js";
 
-import type { NodeAny } from "./b64url"; 
-import type { Project } from "./project"; 
+import type { NodeAny } from "./b64url/index.js"; 
+import type { Project } from "./project.js"; 
 
 type Fn = (a: NodeAny) => void;
 

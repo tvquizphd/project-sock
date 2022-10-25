@@ -26,13 +26,28 @@ If a project with "PROJECT TITLE" exists, it will be reused.
 pnpm install
 ```
 
-### Lint
+### Development
 
 ```
-pnpm lint
+pnpm build:lint
+npx rollup src/index.js --file bundle.js --format esm
 ```
 
-Or, run `pnpm build:lint`.
+Now link "bundle.js" in relevant dependencies.
+
+### Test
+
+Create a GitHub token with `repo` and `project` scope. Write to `.env`:
+
+```properties
+GITHUB_USER="USERNAME"
+GITHUB_REPO="TEST_REPOSITORY"
+GITHUB_TOKEN="TEST_USER_TOKEN"
+```
+
+```
+pnpm test
+```
 
 ### Publish
 

@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProjectChannel = void 0;
-const b64url_1 = require("./b64url");
+import { toB64urlQuery, fromB64urlQuery } from "./b64url/index.js";
 const serialize = (data) => {
-    return (0, b64url_1.toB64urlQuery)({ data });
+    return toB64urlQuery({ data });
 };
 const deserialize = (str) => {
-    return (0, b64url_1.fromB64urlQuery)(str).data;
+    return fromB64urlQuery(str).data;
 };
 class ProjectChannel {
     constructor(inputs) {
@@ -33,4 +30,4 @@ class ProjectChannel {
         this.project.addItem(k, serialize(a));
     }
 }
-exports.ProjectChannel = ProjectChannel;
+export { ProjectChannel };

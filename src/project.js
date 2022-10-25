@@ -199,10 +199,7 @@ class Project {
         });
     }
     async clear(clearArgs) {
-        const { octograph, id, owner, number } = this;
-        const to_fetch = { id, owner, number, octograph };
-        const items = await fetchItems(to_fetch);
-        return await this.clearItems(items, clearArgs);
+        return await this.clearItems(this.items, clearArgs);
     }
     finish() {
         return this.clear({ done: true });

@@ -30,10 +30,9 @@ pnpm install
 
 ```
 pnpm build:lint
-npx rollup src/index.js --file bundle.js --format esm
 ```
 
-Now link "bundle.js" in relevant dependencies.
+Now link "dist/index.js" in relevant dependencies.
 
 ### Test
 

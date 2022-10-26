@@ -7,10 +7,12 @@ export type ProjectSockInputs = ToProjectInputs & {
   scope: string
 }
 
+type OpId = string | undefined;
+
 export interface SocketWrapper {
   sock: ProjectChannel;
-  give: (o: string, t: string, m: string) => void;
-  get: (o: string, t: string) => Promise<any>;
+  give: (o: OpId, t: string, m: string) => void;
+  get: (o: OpId, t: string) => Promise<any>;
 }
 
 interface SocketFunction {
@@ -21,7 +23,8 @@ const socket: SocketFunction = (sock) => ({
   sock,
   get: (op_id, tag) => {
     return new Promise(function (resolve) {
-      const k = sock.toKey(op_id, tag);
+      const op = op_id || "noop";
+      const k = sock.toKey(op, tag);
       if (!sock.hasResponse(k)) {
         sock.listenForKey(k, resolve);
       } else {
@@ -30,7 +33,8 @@ const socket: SocketFunction = (sock) => ({
     });
   },
   give: (op_id, tag, msg) => {
-    const k = sock.toKey(op_id, tag);
+    const op = op_id || "noop";
+    const k = sock.toKey(op, tag);
     sock.sendMail(k, msg);
   },
 });

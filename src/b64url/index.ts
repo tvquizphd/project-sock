@@ -122,7 +122,7 @@ const fromB64val = (v: NodeStr): NodeAny => {
 
 const nester = (params: ObjStr): TreeStr => {
   const keyLists = Object.keys(params).map(k => {
-    const l = k.split('__');
+    const l = k.split('.');
     return {k, l, len: l.length};
   });
   const keys = keyLists.sort((a, b) => a.len - b.len);
@@ -151,23 +151,30 @@ const _toB64urlQuery: ToB64Q = (o, pre=[]) => {
   const entries = Object.entries(toB64urlObj(o));
   return entries.reduce((out, [k, v]) => {
     const keys = [...pre, k];
-    const key = keys.join('__');
+    const key = keys.join('.');
     if (isObj(v)) {
       const value = _toB64urlQuery(v, keys);
       return `${out}${value}`;
     }
-    return `${out}&${key}=${v}`;
+    return `${out}#${key}=${v}`;
   }, '');
 }
 
 const toB64urlQuery = (o: TreeAny) => {
-  return _toB64urlQuery(o).replace('&', '?');
+  return _toB64urlQuery(o);
 }
 
-const fromB64urlQuery: FromB64Q = (search) => {
-  const searchParams = new URLSearchParams(search);
-  const params = Object.fromEntries(searchParams.entries());
-  return fromB64urlObj(nester(params));
+const toPair = (o: ObjStr, s: string): ObjStr => {
+  const [k, v] = s.split("=");
+  o[k] = v || "";
+  return o;
+}
+
+const fromB64urlQuery: FromB64Q = (hash) => {
+  const pairs = hash.slice(1).split("#");
+  const obj: ObjStr = {};
+  pairs.reduce(toPair, obj);
+  return fromB64urlObj(nester(obj));
 }
 
 export {
